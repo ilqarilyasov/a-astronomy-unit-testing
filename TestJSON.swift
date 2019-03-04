@@ -8,6 +8,8 @@
 
 import Foundation
 
+// MARK: - Valid Rover JSON. Name: "Curiosity"
+
 let validRoverJSON = """
 {
     "photo_manifest": {
@@ -69,6 +71,8 @@ let validRoverJSON = """
     }
 }
 """.data(using: .utf8)!
+
+// MARK: - Valid Sol 1 JSON
 
 let validSol1JSON = """
 {
