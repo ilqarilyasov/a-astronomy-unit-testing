@@ -10,31 +10,16 @@ import XCTest
 @testable import Astronomy
 
 class MarsRoverClientTests: XCTestCase {
-
-    override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
-    }
     
     func testFetchMarsRover() {
-        let expectation = self.expectation(description: "Rover should have a value.")
         let mockLoader = MockLoader(data: validRoverJSON, error: nil)
         let client = MarsRoverClient(networkDataLoader: mockLoader)
         
-        client.fetchMarsRover(named: "Curiosity", using: mockLoader) { (rover, error) in
+        let expectation = self.expectation(description: "Rover should have a value.")
+        client.fetchMarsRover(named: "Curiosity") { (rover, error) in
+            defer { expectation.fulfill() }
             XCTAssertNotNil(rover)
             XCTAssertNil(error)
-            expectation.fulfill()
         }
         
         waitForExpectations(timeout: 5) { (error) in
@@ -45,6 +30,28 @@ class MarsRoverClientTests: XCTestCase {
     }
     
     func testFetchPhotos() {
+        let mockLoader = MockLoader(data: validSol1JSON, error: nil)
+        let client = MarsRoverClient(networkDataLoader: mockLoader)
+        
+        let decoder = MarsPhotoReference.jsonDecoder
+        let roverDict = try! decoder.decode([String: MarsRover].self, from: validRoverJSON)
+        let rover = roverDict["photoManifest"]!
+        
+        let expectation = self.expectation(description: "Rover should have a value.")
+        client.fetchPhotos(from: rover, onSol: 1) { (photoRef, error) in
+            defer { expectation.fulfill() }
+            XCTAssertNotNil(photoRef)
+            XCTAssertNil(error)
+        }
+        
+        self.waitForExpectations(timeout: 15) { (error) in
+            if let error = error {
+                NSLog("Error waiting for expectation: \(error)")
+            }
+        }
+    }
+    
+    func testFetchPhotoOperation() {
         
     }
 
